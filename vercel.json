@@ -25,7 +25,6 @@
         "VIEW_COMPILED_PATH": "/tmp",
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "cookie",
-        "NODE_ENV": "production"
+        "SESSION_DRIVER": "cookie"
     }
 }
