@@ -1,6 +1,8 @@
 {
     "version": 2,
     "framework": null,
+    "buildCommand": "composer install --no-dev --optimize-autoloader && npm ci && npm run build",
+    "outputDirectory": "public",
     "functions": {
         "api/index.php": {
             "runtime": "vercel-php@0.7.3"
@@ -14,8 +16,8 @@
     ],
     "env": {
         "APP_ENV": "production",
-        "APP_DEBUG": "true",
-        "APP_URL": "https://yourproductionurl.com",
+        "APP_DEBUG": "false",
+        "APP_URL": "https://snuggle-space.vercel.app",
         "APP_KEY": "base64:EunPZusgrkFHBBJ57DYrrYkhRE0Pac1Nwr9tLtzyuik=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
@@ -25,6 +27,7 @@
         "VIEW_COMPILED_PATH": "/tmp",
         "CACHE_DRIVER": "array",
         "LOG_CHANNEL": "stderr",
-        "SESSION_DRIVER": "cookie"
+        "SESSION_DRIVER": "cookie",
+        "NODE_ENV": "production"
     }
 }
