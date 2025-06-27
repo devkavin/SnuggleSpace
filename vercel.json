@@ -16,7 +16,7 @@
         "APP_ENV": "production",
         "APP_DEBUG": "true",
         "APP_URL": "https://yourproductionurl.com",
-        "API_KEY": "base64:cCcoeEHPERnWGQILxxT+0Xh+t8VaRjPun3ZSlYdsZTU=",
+        "API_KEY": "base64:EunPZusgrkFHBBJ57DYrrYkhRE0Pac1Nwr9tLtzyuik=",
         "APP_CONFIG_CACHE": "/tmp/config.php",
         "APP_EVENTS_CACHE": "/tmp/events.php",
         "APP_PACKAGES_CACHE": "/tmp/packages.php",
