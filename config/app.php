@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'force_https' => env('APP_ENV') === 'production',
+    'force_https' => env('APP_ENV', 'production') === 'production',
 
     /*
     |--------------------------------------------------------------------------

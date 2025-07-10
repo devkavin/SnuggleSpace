@@ -22,7 +22,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Vite::prefetch(concurrency: 3);
-        if (config('app.force_https')) {
+        
+        // Force HTTPS in production (especially for Vercel)
+        if (app()->environment('production')) {
             URL::forceScheme('https');
         }
     }
