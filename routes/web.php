@@ -20,6 +20,31 @@ Route::get('/', function () {
     ]);
 });
 
+// Debug route to test database connection
+Route::get('/debug', function () {
+    try {
+        \Illuminate\Support\Facades\DB::connection()->getPdo();
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Database connection successful',
+            'session_driver' => config('session.driver'),
+            'cache_driver' => config('cache.default'),
+            'app_env' => config('app.env'),
+            'app_debug' => config('app.debug'),
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Database connection failed',
+            'error' => $e->getMessage(),
+            'session_driver' => config('session.driver'),
+            'cache_driver' => config('cache.default'),
+            'app_env' => config('app.env'),
+            'app_debug' => config('app.debug'),
+        ], 500);
+    }
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
