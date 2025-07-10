@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Note;
+use App\Events\NoteSent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -59,6 +60,9 @@ class NoteController extends Controller
 
             // Load the recipient relationship for the response
             $note->load('recipient');
+
+            // Broadcast the event for real-time updates
+            event(new NoteSent($note, $user, $partner));
 
             return response()->json([
                 'success' => true,

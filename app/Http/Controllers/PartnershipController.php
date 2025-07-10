@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Partnership;
 use App\Models\User;
+use App\Events\PartnershipRequestSent;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -54,6 +55,9 @@ class PartnershipController extends Controller
             'partner_id' => $partner->id,
             'status' => 'pending',
         ]);
+
+        // Broadcast the event for real-time updates
+        event(new PartnershipRequestSent($partnership, $user, $partner));
 
         return response()->json($partnership, 201);
     }

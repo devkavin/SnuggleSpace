@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\WatchList;
+use App\Events\WatchListItemAdded;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,14 @@ class WatchListController extends Controller
             'image_url' => 'nullable|url',
         ]);
 
-        $watchList = Auth::user()->watchList()->create($request->all());
+        $user = Auth::user();
+        $watchList = $user->watchList()->create($request->all());
+
+        // Get partner for real-time updates
+        $partner = $user->partner;
+
+        // Broadcast the event for real-time updates
+        event(new WatchListItemAdded($watchList, $user, $partner));
 
         return response()->json($watchList, 201);
     }

@@ -5,6 +5,7 @@ use App\Http\Controllers\WatchListController;
 use App\Http\Controllers\PartnershipController;
 use App\Http\Controllers\NoteController;
 use App\Http\Controllers\SpinnerGameController;
+use App\Http\Controllers\RealtimeController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -155,6 +156,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/stats', [SpinnerGameController::class, 'stats'])->name('spinner.stats');
             Route::get('/{spinnerGame}', [SpinnerGameController::class, 'show'])->name('spinner.show');
         });
+
+        // Real-time Updates Route
+        Route::get('/realtime/stream', [RealtimeController::class, 'stream'])->name('realtime.stream');
     });
 });
 

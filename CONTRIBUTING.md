@@ -352,7 +352,7 @@ Screenshots, mockups, etc.
 
 ### Reporting Security Issues
 
-- Email security issues to security@snugglespace.com
+- Forward security issues to [Email loading...]
 - Don't create public issues for security problems
 - Provide detailed information about the vulnerability
 

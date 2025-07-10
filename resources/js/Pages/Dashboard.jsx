@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import axios from 'axios';
+import { useRealtime } from '../Hooks/useRealtime';
 
 export default function Dashboard({ auth }) {
     const [activeTab, setActiveTab] = useState('watchlist');
@@ -40,6 +41,54 @@ export default function Dashboard({ auth }) {
             window.removeEventListener('unhandledrejection', handleUnhandledRejection);
         };
     }, []);
+
+    // Real-time event handlers
+    useRealtime('note.sent', (data) => {
+        // Add new note to received notes
+        setNotes(prevNotes => ({
+            ...prevNotes,
+            received: [{
+                id: data.note.id,
+                message: data.note.message,
+                color: data.note.color,
+                is_read: false,
+                created_at: data.note.created_at,
+                sender: {
+                    id: data.sender.id,
+                    name: data.sender.name,
+                }
+            }, ...prevNotes.received]
+        }));
+    });
+
+    useRealtime('partnership.request.sent', (data) => {
+        // Add new partnership request
+        setPartnerships(prevPartnerships => ({
+            ...prevPartnerships,
+            pending_requests: [{
+                id: data.partnership.id,
+                status: data.partnership.status,
+                created_at: data.partnership.created_at,
+                user: {
+                    id: data.sender.id,
+                    name: data.sender.name,
+                    email: data.sender.email,
+                }
+            }, ...prevPartnerships.pending_requests]
+        }));
+    });
+
+    useRealtime('watchlist.item.added', (data) => {
+        // Add new watch list item from partner
+        setPartnerWatchList(prevList => [{
+            id: data.watch_list_item.id,
+            title: data.watch_list_item.title,
+            type: data.watch_list_item.type,
+            status: data.watch_list_item.status,
+            rating: data.watch_list_item.rating,
+            created_at: data.watch_list_item.created_at,
+        }, ...prevList]);
+    });
 
     useEffect(() => {
         const handleClickOutside = (event) => {
