@@ -56,61 +56,20 @@ export default function Dashboard({ auth }) {
         try {
             setError(null);
 
-            // Load data with individual error handling
-            let watchListRes, partnershipsRes, notesRes, spinnerRes;
+            // Use the new combined endpoint for better performance
+            const response = await axios.get('/v1/dashboard-data');
+            const data = response.data;
 
-            try {
-                watchListRes = await axios.get('/v1/watch-list');
-            } catch (error) {
-                console.error('Error loading watch list:', error);
-                watchListRes = { data: [] };
-            }
-
-            try {
-                partnershipsRes = await axios.get('/v1/partnerships');
-            } catch (error) {
-                console.error('Error loading partnerships:', error);
-                partnershipsRes = { data: { pending_requests: [], accepted_partnership: null } };
-            }
-
-            try {
-                notesRes = await axios.get('/v1/notes');
-                console.log('Notes API response:', notesRes.data); // Debug log
-            } catch (error) {
-                console.error('Error loading notes:', error);
-                console.error('Notes error response:', error.response?.data); // Debug log
-                notesRes = { data: { sent_notes: [], received_notes: [] } };
-            }
-
-            try {
-                spinnerRes = await axios.get('/v1/spinner');
-            } catch (error) {
-                console.error('Error loading spinner games:', error);
-                spinnerRes = { data: [] };
-            }
-
-            setWatchList(watchListRes.data || []);
-            setPartnerships(partnershipsRes.data || { pending_requests: [], accepted_partnership: null });
+            setWatchList(data.watch_list || []);
+            setPartnerships(data.partnerships || { pending_requests: [], accepted_partnership: null });
             setNotes({
-                sent: notesRes.data?.sent_notes || [],
-                received: notesRes.data?.received_notes || []
+                sent: data.notes?.sent_notes || [],
+                received: data.notes?.received_notes || []
             });
-            setSpinnerGames(spinnerRes.data || []);
-
-            // Load partner's watch list if partnership exists
-            if (partnershipsRes.data?.accepted_partnership) {
-                try {
-                    const partnerWatchListRes = await axios.get('/v1/watch-list/partner/list');
-                    setPartnerWatchList(partnerWatchListRes.data || []);
-                } catch (partnerError) {
-                    console.error('Error loading partner watch list:', partnerError);
-                    setPartnerWatchList([]);
-                }
-            } else {
-                setPartnerWatchList([]);
-            }
+            setSpinnerGames(data.spinner_games || []);
+            setPartnerWatchList(data.partner_watch_list || []);
         } catch (error) {
-            console.error('Error loading data:', error);
+            console.error('Error loading dashboard data:', error);
             setError('Failed to load data. Please refresh the page.');
         } finally {
             setLoading(false);

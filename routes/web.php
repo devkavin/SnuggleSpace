@@ -8,6 +8,8 @@ use App\Http\Controllers\SpinnerGameController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 Route::get('/', function () {
     if (auth()->check()) {
@@ -72,6 +74,45 @@ Route::middleware('auth')->group(function () {
 
     // API Routes (temporarily moved back to web.php for testing)
     Route::prefix('v1')->group(function () {
+        // Combined dashboard data endpoint for better performance
+        Route::get('/dashboard-data', function () {
+            try {
+                $user = Auth::user();
+                
+                // Load all data in parallel using collections
+                $watchList = $user->watchList()->orderBy('created_at', 'desc')->get();
+                $partnerships = $user->partnerships()->with('partner')->get();
+                $partnerRequests = $user->partnerRequests()->with('user')->get();
+                $acceptedPartnership = $user->acceptedPartnership()->with('partner')->first();
+                $sentNotes = $user->sentNotes()->with('recipient')->orderBy('created_at', 'desc')->get();
+                $receivedNotes = $user->receivedNotes()->with('sender')->orderBy('created_at', 'desc')->get();
+                $spinnerGames = $user->spinnerGames()->with('partner')->orderBy('played_at', 'desc')->get();
+                
+                // Load partner's watch list if partnership exists
+                $partnerWatchList = collect([]);
+                if ($acceptedPartnership) {
+                    $partnerWatchList = $acceptedPartnership->partner->watchList()->orderBy('created_at', 'desc')->get();
+                }
+                
+                return response()->json([
+                    'watch_list' => $watchList,
+                    'partnerships' => [
+                        'pending_requests' => $partnerRequests,
+                        'accepted_partnership' => $acceptedPartnership,
+                    ],
+                    'notes' => [
+                        'sent_notes' => $sentNotes,
+                        'received_notes' => $receivedNotes,
+                    ],
+                    'spinner_games' => $spinnerGames,
+                    'partner_watch_list' => $partnerWatchList,
+                ]);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error in dashboard data: ' . $e->getMessage());
+                return response()->json(['error' => 'Failed to load dashboard data'], 500);
+            }
+        })->name('dashboard.data');
+
         // Watch List Routes
         Route::prefix('watch-list')->group(function () {
             Route::get('/', [WatchListController::class, 'index'])->name('watch-list.index');
