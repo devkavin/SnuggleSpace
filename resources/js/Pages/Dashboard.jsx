@@ -60,21 +60,21 @@ export default function Dashboard({ auth }) {
             let watchListRes, partnershipsRes, notesRes, spinnerRes;
 
             try {
-                watchListRes = await axios.get('/api/watch-list');
+                watchListRes = await axios.get('/v1/watch-list');
             } catch (error) {
                 console.error('Error loading watch list:', error);
                 watchListRes = { data: [] };
             }
 
             try {
-                partnershipsRes = await axios.get('/api/partnerships');
+                partnershipsRes = await axios.get('/v1/partnerships');
             } catch (error) {
                 console.error('Error loading partnerships:', error);
                 partnershipsRes = { data: { pending_requests: [], accepted_partnership: null } };
             }
 
             try {
-                notesRes = await axios.get('/api/notes');
+                notesRes = await axios.get('/v1/notes');
                 console.log('Notes API response:', notesRes.data); // Debug log
             } catch (error) {
                 console.error('Error loading notes:', error);
@@ -83,7 +83,7 @@ export default function Dashboard({ auth }) {
             }
 
             try {
-                spinnerRes = await axios.get('/api/spinner');
+                spinnerRes = await axios.get('/v1/spinner');
             } catch (error) {
                 console.error('Error loading spinner games:', error);
                 spinnerRes = { data: [] };
@@ -100,7 +100,7 @@ export default function Dashboard({ auth }) {
             // Load partner's watch list if partnership exists
             if (partnershipsRes.data?.accepted_partnership) {
                 try {
-                    const partnerWatchListRes = await axios.get('/api/watch-list/partner/list');
+                    const partnerWatchListRes = await axios.get('/v1/watch-list/partner/list');
                     setPartnerWatchList(partnerWatchListRes.data || []);
                 } catch (partnerError) {
                     console.error('Error loading partner watch list:', partnerError);
@@ -120,7 +120,7 @@ export default function Dashboard({ auth }) {
     const addWatchListItem = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('/api/watch-list', newItem);
+            const response = await axios.post('/v1/watch-list', newItem);
             setWatchList([response.data, ...watchList]);
             setNewItem({ title: '', type: 'movie', status: 'plan_to_watch' });
         } catch (error) {
@@ -142,7 +142,7 @@ export default function Dashboard({ auth }) {
             console.log('Sending note:', newNote); // Debug log
             console.log('Current partnerships:', partnerships); // Debug log
 
-            const response = await axios.post('/api/notes', newNote);
+            const response = await axios.post('/v1/notes', newNote);
             console.log('Note response:', response.data); // Debug log
 
             // Handle both old and new API response formats
@@ -204,7 +204,7 @@ export default function Dashboard({ auth }) {
         }
 
         try {
-            const response = await axios.delete(`/api/notes/${noteId}`);
+            const response = await axios.delete(`/v1/notes/${noteId}`);
 
             if (response.data.success) {
                 // Remove from sent notes
@@ -221,7 +221,7 @@ export default function Dashboard({ auth }) {
 
     const markNoteAsRead = async (noteId) => {
         try {
-            await axios.patch(`/api/notes/${noteId}/read`);
+            await axios.patch(`/v1/notes/${noteId}/read`);
 
             // Update the note in received notes
             setNotes(prevNotes => ({
@@ -245,7 +245,7 @@ export default function Dashboard({ auth }) {
         setError(null);
 
         try {
-            const response = await axios.post('/api/spinner/spin', { type: spinnerType });
+            const response = await axios.post('/v1/spinner/spin', { type: spinnerType });
 
             if (response.data.success) {
                 // Add a small delay for better UX
@@ -282,7 +282,7 @@ export default function Dashboard({ auth }) {
 
     const requestPartnership = async (email) => {
         try {
-            await axios.post('/api/partnerships', { partner_email: email });
+            await axios.post('/v1/partnerships', { partner_email: email });
             alert('Partnership request sent!');
             await loadData(); // Reload data to show updated state
         } catch (error) {
@@ -292,7 +292,7 @@ export default function Dashboard({ auth }) {
 
     const acceptPartnership = async (partnershipId) => {
         try {
-            await axios.patch(`/api/partnerships/${partnershipId}/accept`);
+            await axios.patch(`/v1/partnerships/${partnershipId}/accept`);
             alert('Partnership accepted!');
             await loadData(); // Reload data to show updated state
         } catch (error) {
@@ -302,7 +302,7 @@ export default function Dashboard({ auth }) {
 
     const rejectPartnership = async (partnershipId) => {
         try {
-            await axios.patch(`/api/partnerships/${partnershipId}/reject`);
+            await axios.patch(`/v1/partnerships/${partnershipId}/reject`);
             alert('Partnership request rejected');
             await loadData(); // Reload data to show updated state
         } catch (error) {
@@ -314,7 +314,7 @@ export default function Dashboard({ auth }) {
         if (!partnerships.accepted_partnership) return;
 
         try {
-            await axios.delete(`/api/partnerships/${partnerships.accepted_partnership.id}`);
+            await axios.delete(`/v1/partnerships/${partnerships.accepted_partnership.id}`);
             alert('Partnership ended');
             await loadData(); // Reload data to show updated state
         } catch (error) {

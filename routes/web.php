@@ -49,7 +49,7 @@ Route::get('/debug', function () {
 Route::get('/routes', function () {
     $routes = [];
     foreach (\Illuminate\Support\Facades\Route::getRoutes() as $route) {
-        if (str_contains($route->getName(), 'partnerships') || str_contains($route->uri(), 'api/')) {
+        if (str_contains($route->getName(), 'partnerships') || str_contains($route->uri(), 'v1/')) {
             $routes[] = [
                 'name' => $route->getName(),
                 'uri' => $route->uri(),
@@ -71,7 +71,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // API Routes (temporarily moved back to web.php for testing)
-    Route::prefix('api')->group(function () {
+    Route::prefix('v1')->group(function () {
         // Watch List Routes
         Route::prefix('watch-list')->group(function () {
             Route::get('/', [WatchListController::class, 'index'])->name('watch-list.index');
