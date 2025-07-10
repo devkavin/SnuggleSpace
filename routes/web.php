@@ -45,6 +45,21 @@ Route::get('/debug', function () {
     }
 });
 
+// Debug route to check available routes
+Route::get('/routes', function () {
+    $routes = [];
+    foreach (\Illuminate\Support\Facades\Route::getRoutes() as $route) {
+        if (str_contains($route->getName(), 'partnerships')) {
+            $routes[] = [
+                'name' => $route->getName(),
+                'uri' => $route->uri(),
+                'methods' => $route->methods(),
+            ];
+        }
+    }
+    return response()->json($routes);
+});
+
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
@@ -71,6 +86,11 @@ Route::middleware('auth')->group(function () {
         Route::patch('/{partnership}/accept', [PartnershipController::class, 'accept'])->name('partnerships.accept');
         Route::patch('/{partnership}/reject', [PartnershipController::class, 'reject'])->name('partnerships.reject');
         Route::delete('/{partnership}', [PartnershipController::class, 'destroy'])->name('partnerships.destroy');
+        
+        // Test route to verify partnerships are working
+        Route::get('/test', function () {
+            return response()->json(['message' => 'Partnership routes are working!']);
+        })->name('partnerships.test');
     });
 
     // Notes Routes

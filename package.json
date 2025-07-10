@@ -5,7 +5,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "vercel-build": "vite build"
+        "vercel-build": "vite build && php artisan route:clear && php artisan config:clear"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
