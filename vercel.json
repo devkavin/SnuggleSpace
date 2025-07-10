@@ -39,7 +39,6 @@
         "SESSION_HTTP_ONLY": "true",
         "SESSION_SAME_SITE": "lax",
         "DB_CONNECTION": "pgsql",
-        "DB_URL": "postgres://postgres.dnlhlblzhbymhfslaakx:ETXSjd4xUriBFSOa@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require&supa=base-pooler.x",
         "QUEUE_CONNECTION": "sync",
         "SESSION_LIFETIME": "120"
     }
