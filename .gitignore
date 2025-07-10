@@ -22,3 +22,7 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Screenshots (placeholder files)
+docs/screenshots/*.png
+!docs/screenshots/logo.png
