@@ -9,7 +9,6 @@
 [![Laravel](https://img.shields.io/badge/Laravel-10.x-red.svg)](https://laravel.com)
 [![React](https://img.shields.io/badge/React-18.x-blue.svg)](https://reactjs.org)
 [![Inertia.js](https://img.shields.io/badge/Inertia.js-1.x-purple.svg)](https://inertiajs.com)
-[![Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black.svg)](https://vercel.com)
 [![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)](https://www.postgresql.org)
 
 [Live Demo](#) • [Features](#features) • [Tech Stack](#tech-stack) • [Installation](#installation)
@@ -115,7 +114,6 @@ SnuggleSpace is a modern web application designed specifically for couples who l
 - **Vite** - Fast build tool and development server
 
 ### Deployment & Infrastructure
-- **Vercel** - Serverless deployment platform
 - **Supabase** - PostgreSQL database hosting
 - **GitHub** - Version control and CI/CD
 
@@ -219,9 +217,11 @@ SnuggleSpace is a modern web application designed specifically for couples who l
    - Configure database connection
    - Set up cache and session drivers
 
-3. **Deploy to Vercel**
+3. **Deploy to your preferred hosting platform**
    ```bash
-   vercel --prod
+   # Example for traditional hosting
+   # Upload files to your web server
+   # Configure your web server to point to the public directory
    ```
 
 ---
@@ -252,7 +252,7 @@ SnuggleSpace is a modern web application designed specifically for couples who l
 APP_NAME="SnuggleSpace"
 APP_ENV=production
 APP_DEBUG=false
-APP_URL=https://your-domain.vercel.app
+APP_URL=https://your-domain.com
 
 # Database
 DB_CONNECTION=pgsql
@@ -263,7 +263,7 @@ CACHE_DRIVER=database
 SESSION_DRIVER=cookie
 SESSION_SECURE_COOKIE=true
 
-# Vercel Specific
+# Cache Configuration
 APP_CONFIG_CACHE=/tmp/config.php
 APP_EVENTS_CACHE=/tmp/events.php
 APP_PACKAGES_CACHE=/tmp/packages.php
@@ -343,7 +343,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Laravel Team** - For the amazing PHP framework
 - **Inertia.js** - For seamless SPA development
-- **Vercel** - For excellent hosting and deployment
 - **Supabase** - For reliable database hosting
 - **Tailwind CSS** - For beautiful, responsive design
 
