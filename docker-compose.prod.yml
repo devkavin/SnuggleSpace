@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+  # Nginx Web Server
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+      - ./public:/var/www/html/public
+      - ./storage:/var/www/html/storage
+      - ./docker/ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    networks:
+      - snugglespace
+    restart: unless-stopped
+
+  # PHP-FPM Application
+  app:
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    volumes:
+      - .:/var/www/html
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/custom.ini
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+    networks:
+      - snugglespace
+    depends_on:
+      - pgsql
+      - redis
+    restart: unless-stopped
+
+  # PostgreSQL Database
+  pgsql:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - snugglespace
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    networks:
+      - snugglespace
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - ./docker/ssl:/etc/letsencrypt
+      - ./public:/var/www/html/public
+    command: certonly --webroot --webroot-path=/var/www/html/public --email ${CERTBOT_EMAIL} --agree-tos --no-eff-email -d snugglespace.devkavin.com
+    depends_on:
+      - nginx
+    networks:
+      - snugglespace
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  snugglespace:
+    driver: bridge 
