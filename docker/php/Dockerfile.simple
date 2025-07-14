@@ -17,17 +17,22 @@ RUN apk add --no-cache \
     autoconf \
     gcc \
     g++ \
-    make
+    make \
+    linux-headers
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
-# Install Redis extension
-RUN pecl install redis && docker-php-ext-enable redis
+# Install Redis extension using docker-php-ext-install (if available) or pecl
+RUN if docker-php-ext-install redis 2>/dev/null; then \
+        echo "Redis installed via docker-php-ext-install"; \
+    else \
+        pecl install redis && docker-php-ext-enable redis; \
+    fi
 
 # Clean up build dependencies
-RUN apk del autoconf gcc g++ make
+RUN apk del autoconf gcc g++ make linux-headers
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
