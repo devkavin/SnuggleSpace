@@ -46,6 +46,13 @@ if ! command -v docker &> /dev/null; then
     print_warning "Docker installed. You may need to log out and back in for group changes to take effect."
 fi
 
+# Check if user is in docker group
+if ! groups $USER | grep -q docker; then
+    print_error "User is not in docker group. Please run: newgrp docker"
+    print_error "Or log out and log back in, then run this script again."
+    exit 1
+fi
+
 # Install Docker Compose if not already installed
 if ! command -v docker-compose &> /dev/null; then
     print_status "Installing Docker Compose..."
@@ -74,21 +81,24 @@ cd $APP_DIR
 # Create production environment file
 if [ ! -f ".env" ]; then
     print_status "Creating production environment file..."
-    cp .env.example .env
-    
-    # Generate application key
-    print_status "Generating application key..."
-    docker-compose -f docker-compose.prod.yml run --rm app php artisan key:generate --no-interaction
+    cp env.production.template .env
     
     print_warning "Please edit .env file with your production settings before continuing."
     print_warning "Important settings to configure:"
     print_warning "  - DB_PASSWORD: Set a secure database password"
     print_warning "  - CERTBOT_EMAIL: Set your email for SSL certificates"
-    print_warning "  - APP_KEY: Should be auto-generated"
+    print_warning "  - APP_KEY: Will be auto-generated"
     
     read -p "Press Enter after you've configured the .env file..."
 else
     print_status "Environment file already exists."
+    
+    # Check if CERTBOT_EMAIL is set
+    if ! grep -q "CERTBOT_EMAIL=" .env || grep -q "CERTBOT_EMAIL=your-email@example.com" .env; then
+        print_warning "CERTBOT_EMAIL is not set or still has default value."
+        print_warning "Please edit .env file and set CERTBOT_EMAIL to your email address."
+        read -p "Press Enter after you've configured CERTBOT_EMAIL in the .env file..."
+    fi
 fi
 
 # Create SSL directory
