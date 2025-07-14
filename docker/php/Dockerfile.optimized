@@ -1,3 +1,21 @@
+# Build stage
+FROM node:18-alpine AS node-builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci
+
+# Copy source files
+COPY . .
+
+# Build assets
+RUN npm run build
+
+# Production stage
 FROM php:8.2-fpm-alpine
 
 # Install system dependencies
@@ -18,21 +36,18 @@ RUN apk add --no-cache \
     gcc \
     g++ \
     make \
-    linux-headers
+    nodejs \
+    npm
 
 # Install PHP extensions
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo pdo_pgsql mbstring exif pcntl bcmath gd zip
 
-# Install Redis extension using docker-php-ext-install (if available) or pecl
-RUN if docker-php-ext-install redis 2>/dev/null; then \
-        echo "Redis installed via docker-php-ext-install"; \
-    else \
-        pecl install redis && docker-php-ext-enable redis; \
-    fi
+# Install Redis extension
+RUN pecl install redis && docker-php-ext-enable redis
 
 # Clean up build dependencies
-RUN apk del autoconf gcc g++ make linux-headers
+RUN apk del autoconf gcc g++ make
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -40,17 +55,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy existing application directory
+# Copy application files
 COPY . .
 
-# Install dependencies
+# Copy built assets from node-builder stage
+COPY --from=node-builder /app/public/build ./public/build
+
+# Install PHP dependencies
 RUN composer install --optimize-autoloader --no-dev --no-interaction
-
-# Install Node.js and npm
-RUN apk add --no-cache nodejs npm
-
-# Install frontend dependencies and build assets
-RUN npm ci && npm run build && npm prune --production
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

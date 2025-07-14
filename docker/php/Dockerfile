@@ -45,7 +45,7 @@ RUN composer install --optimize-autoloader --no-dev --no-interaction
 RUN apk add --no-cache nodejs npm
 
 # Install frontend dependencies and build assets
-RUN npm ci --only=production && npm run build
+RUN npm ci && npm run build && npm prune --production
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \
